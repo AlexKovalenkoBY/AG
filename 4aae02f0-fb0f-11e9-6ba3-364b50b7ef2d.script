@@ -1,0 +1,67 @@
+var g_Nloc = Context.getSelectedLanguage();
+var File = Context.createOutputObject();
+File.DefineF("STYLE_ST_APPL_SYS_CLS", "Arial",16,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT|Constants.FMT_BOLD,95,0,0,0,0,1); 
+File.DefineF("STYLE_ST_APPL_SYS_TYPE", "Arial",12,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT|Constants.FMT_BOLD|Constants.FMT_ITALIC,95,0,0,0,0,1); 
+File.DefineF("STYLE_ST_MODULE_TYPE", "Arial",10,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT,95,0,0,0,0,1); 
+main();
+
+function main(){
+
+var SelectedModelList = ArisData.getSelectedModels();
+var SelectedModel = SelectedModelList[0];
+SelectedModel.BuildGraph(true);
+var startObjects = SelectedModel.StartNodeList().filter(function(startObject)
+{    return startObject.SymbolNum()==Constants.ST_APPL_SYS_CLS});
+
+    startObjects.forEach(function(startObject)
+    {
+        File.OutputLn(startObject.ObjDef().Name(g_Nloc),"Arial",24,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_CENTER| Constants.FMT_ITALIC|Constants.FMT_BOLD,0)
+        SelectedModel.MarkVisited(startObject,true);
+});
+
+
+DrawChild(startObjects[0], File, SelectedModel,0);
+
+File.WriteReport();
+}
+function DrawChild(startObject, output, model,count)
+{
+  
+    var nextnodes = startObject.getConnectedObjOccs([Constants.ST_APPL_SYS_CLS,Constants.ST_APPL_SYS_TYPE,Constants.ST_MOD_TYPE], Constants.EDGES_INOUT).filter(function(startObject){return model.GetVisited(startObject)==false});
+  // var 
+   if (nextnodes.length !=0)
+    {  for (var i=0; i<nextnodes.length;i++) 
+        { 
+            var prefix ="";// count +"."+(i+1);
+           (count==0)?  prefix = (1+i)+".":  prefix = ""+count+(i+1)+"."; 
+            if (!model.GetVisited(nextnodes[i])) 
+            {   model.MarkVisited(nextnodes[i],true);
+
+            //здесь необходимо анализировать тип выводимого объекта и при необходимости менять под него шрифт в зависимости от его символа
+        /*
+
+        switch(nextnodes[i].SymbolNum()) {
+  case 14:  // стиль для класса системы
+     var  currentstyle = STYLE_ST_APPL_SYS_CLS
+    [break]
+
+  case 33:  // стиль для информационных сиситем
+    ...
+    [break]
+
+  default:
+    ...   //стиль для модулей систем
+    [break]
+}
+        */
+                File.OutputLn(prefix+nextnodes[i].ObjDef().Name(g_Nloc),"Arial",20,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC,0)
+                DrawChild(nextnodes[i], output, model,prefix);
+//учесть декомпозированную модель 
+                if (nextnodes[i].ObjDef().AssignedModels(13)!=null) {
+                    
+                };
+             }
+        }
+    }
+    else return
+}

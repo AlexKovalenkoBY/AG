@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scriptinfodata version="7.1.0">
+    <scriptinfo idcomp="1" runkind="0" runtypes="" contexttype="1" eventids="" extratypes="" outfiletypes="4," scriptlang="2" filter="" template="" dialogsallowed="1" dbwriteallowed="1">
+        <contexts>
+            <context clsid="10009" types="22," usertypes="" />
+        </contexts>
+        <pageformat name="A4" width="210.10" height="297.20" orientation="1" top="30" left="20" right="20" bottom="30" dheader="10" dfooter="10" />
+        <protection cdkey="" kind="0" passwd="" />
+        <debuginfos bookmarks="" breakpoints="44,">
+            <evaluates>
+                <eval>curr_obj.Name(g_Nloc)</eval>
+                <eval>var conected_func = roles[i].getConnectedObjOccs([Constants.ST_FUNC],Constants.EDGES_OUT);
+           Dialogs.MsgBox(roles[j].ObjDef().Name(Context.getSelectedLanguage())+conected_func.length);</eval>
+                <eval>Dialogs.MsgBox(roles[j].ObjDef().Name(Context.getSelectedLanguage())+conected_func.length);</eval>
+            </evaluates>
+        </debuginfos>
+    </scriptinfo>
+</scriptinfodata>
+

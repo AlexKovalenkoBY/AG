@@ -1,0 +1,11 @@
+
+var g_Nloc = Context.getSelectedLanguage();
+
+main(); //вызов главной функции скрипта
+
+function main () {
+
+  var selected_obj = ArisData.getSelectedObjOccs(); //взяли объект из контекста (должны взять по крайней мере)
+     var func_list = selected_obj.getConnectedObjOccs([Constants.ST_FUNC]);
+     Dialogs.MsgBox(current_func.ObjDef().Name(Context.getSelectedLanguage())+" "+conected_func.length);
+}

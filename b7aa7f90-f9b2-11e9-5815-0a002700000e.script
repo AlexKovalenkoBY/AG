@@ -1,0 +1,91 @@
+var g_Nloc = Context.getSelectedLanguage();
+
+main();
+function main(){
+    
+    var xml_file = Context.createXMLOutputObject("xml_expot.xml","Root");
+    var selected_obj = ArisData.getSelectedObjOccs();
+//   var oSelModels = ArisData.getSelectedModels(); //from tutorial
+var func_list=[];
+
+for (var k=0; k<selected_obj.length;k++) {
+  if (selected_obj[k].SymbolNum()==Constants.ST_SCENARIO) { var  func_list  = func_list+selected_obj[k].getConnectedObjOccs([72]) }  
+
+  //selected_obj[0].OccListInModel( )*/ }
+    else 
+        { var func_list = selected_obj}
+   } 
+    var ProcessNode = xml_file.addElement(xml_file.getRootElement(), "Process");
+   
+    
+var    ProcessNode = xml_file.addElement(xml_file.getRootElement(), "Process");
+var    ModelsNode = xml_file.addElement(ProcessNode, "Models");
+var    ModelNode = xml_file.addElement(ModelsNode, "Model");
+var    ObjNode = xml_file.addElement(ModelNode, "ObjOcc");
+var InConnNode =  xml_file.addElement(ObjNode, "InConnections");
+var OutConnNode =  xml_file.addElement(ObjNode, "OutConnections");
+
+for (k=0;k<func_list.length;k++)
+{
+    assigned_models =func_list[k].ObjDef().AssignedModels(13);
+    
+//var oObjOccs = oSelModels.ObjOccList();
+    for (var j = 0; j < assigned_models.length; j++) {
+        var currentmodel = assigned_models[j];//назначенная модель [0]
+         var modelObjOccs =currentmodel.ObjOccList();
+        for (var i=0; i<modelObjOccs.length;i++) {
+          
+        var xml_item =  write2Xml(xml_file, ModelNode, modelObjOccs[i], "ObjOcc");
+         writeXmlCxnIn(xml_file, xml_item,modelObjOccs[i].InEdges(Constants.EDGES_ALL), "InConnections");
+         writeXmlCxnOut(xml_file, xml_item,modelObjOccs[i].OutEdges(Constants.EDGES_ALL), "OutConnections");
+        }
+    }
+    
+}
+   /*    
+    var obj_name=selected_obj[0].ObjDef().Name(g_Nloc);
+ObjNode.setAttribute("Name", obj_name);
+ObjNode.setAttribute("Type", selected_obj[0].ObjDef().Type());
+
+ObjNode.setAttribute("Symbol", selected_obj[0].SymbolName());
+ObjNode.setAttribute("ID", selected_obj[0].ObjDef().GUID());
+
+
+
+    var attrmap = selected_obj[0].ObjDef().AttrMap(g_Nloc);
+
+ */  
+
+
+    xml_file.WriteReport();
+}
+function write2Xml(xmlOutput, xmlParent, oOcc, sElement) {
+    var xmlItem = xmlOutput.addElement(xmlParent, sElement);
+    xmlItem.setAttribute("Name", oOcc.ObjDef().Name(g_Nloc));
+    xmlItem.setAttribute("Type", oOcc.ObjDef().TypeNum());
+    xmlItem.setAttribute("Symbol", oOcc.SymbolName());
+    xmlItem.setAttribute("ID", oOcc.ObjDef().GUID());
+    return xmlItem;
+}
+
+function writeXmlCxnIn(xmlOutput, xmlParent, oCxn, sElement) {
+for (var i=0;i<oCxn.length; i++) {
+    var xmlCxn = xmlOutput.addElement(xmlParent, sElement);
+
+    xmlCxn.setAttribute("SourceName", oCxn[i].SourceObjOcc().ObjDef().Name(g_Nloc));
+    xmlCxn.setAttribute("SourceType", oCxn[i].SourceObjOcc().ObjDef().Type());
+    xmlCxn.setAttribute("SourceGUID", oCxn[i].SourceObjOcc().ObjDef().GUID());
+    
+}
+ //   return xmlCxn;
+}
+
+function writeXmlCxnOut(xmlOutput, xmlParent, oCxn, sElement) {
+for (var i=0;i<oCxn.length; i++) {
+    var xmlCxn = xmlOutput.addElement(xmlParent, sElement);
+    xmlCxn.setAttribute("TargetName", oCxn[i].TargetObjOcc().ObjDef().Name(g_Nloc));    
+    xmlCxn.setAttribute("TargetType", oCxn[i].TargetObjOcc().ObjDef().Type());
+    xmlCxn.setAttribute("TargetGUID", oCxn[i].TargetObjOcc().ObjDef().GUID());
+   // return xmlCxn;
+}
+}

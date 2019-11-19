@@ -1,0 +1,90 @@
+// explane global objects:
+//Context
+//ArisData
+//Dialogs
+var g_Nloc = Context.getSelectedLanguage();
+
+main(); //вызов главной функции скрипта
+
+function main () {
+   var PSD_Process_class  = init_PSD_Process_class();
+   var output_object = Context.createOutputObject(); //создали объект вывода
+   var selected_obj = ArisData.getSelectedObjOccs(); //взяли объект из контекста (должны взять по крайней мере)
+  //запускаю скрипт на объекте "Закупки МБП"
+     var assigned_model= null; 
+     var current_func = null;
+     var automated_func_array = null;
+     var total_func= 0;
+     var total_automated =0;
+  for(var i=0; i<selected_obj.length; i++ )
+ {
+     var curr_obj=selected_obj[i];
+  // вывели название сценария в отчет "Закупки МБП"
+ 
+    output_object.OutputLn(curr_obj.ObjDef().Name(Context.getSelectedLanguage()),"Arial",16,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_CENTER | Constants.FMT_ITALIC | Constants.FMT_BOLD,0);
+   
+     output_object.BeginTable(100,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC| Constants.FMT_REPEAT_HEADER,0);
+       //each row must begin with TableRow()
+        output_object.TableRow();
+ 
+ 
+         var PSD_Processes = curr_obj.getConnectedObjOccs([Constants.ST_PRCS_1],Constants.EDGES_OUT).map(function(PSD_Process){return new PSD_Process_class(PSD_Process)});
+         //как-то предыдущая строка читается с трудом
+         //PSD_Processes массив ф-ий, входящих в "закупки МБП" (5 шт) 
+         var _docList = []; //общий перечень документов для отчета инициировали пустым
+         var docDefs = [];
+         for (var j=0;j< PSD_Processes.length; j++){ 
+             _docList=Array.concat(_docList,PSD_Processes[j].getDocs()); 
+         
+         }
+         
+         _docList = ArisData.Unique(_docList); //надо ли сортировать массив объектов??  работе не мешает, но стоит ли????? 
+         //инициировать первую строку
+         
+         for (j=0;j<_docList.length; j++)
+         {  
+             docDefs[j] = _docList[j].ObjDef(); //docDefs
+         }
+          docDefs = ArisData.Unique(docDefs); //сформировали уникальный массив документов
+          
+    output_object.TableCell("    ",25,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_CENTER|Constants.FMT_BOLD,0);
+    for (j=0;j<PSD_Processes.length; j++) //вывели массив названий подпроцессов  в первую строку
+    {   
+        output_object.TableCell(PSD_Processes[j].getName(),75/PSD_Processes.length,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_CENTER|Constants.FMT_BOLD,0);
+    }
+          
+        for ( j=0;j< docDefs.length; j++){
+               var CurrPSDProcessObject = PSD_Processes[j];
+               output_object.TableRow();
+               output_object.TableCell(docDefs[j].Name(g_Nloc),25,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); //столбец с названиями документов
+               for (i=0;i<PSD_Processes.length;i++)
+               { 
+    
+        var tmp_occ_list ;
+        var tmp_occ_list_def=CurrPSDProcessObject.getObjDef();//.OccListInModel(CurrPSDProcessObject);
+                  if ( PSD_Processes[i].CheckDOC(docDefs[j]))
+     // if ( )
+                   //выводим "Х"
+                   { output_object.TableCell("Х",75/PSD_Processes.length,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_CENTER|Constants.FMT_BOLD,0);}
+                   else 
+                       // ничего не выводим
+                   {output_object.TableCell("  ",75/PSD_Processes.length,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_CENTER|Constants.FMT_BOLD,0);}
+               }
+          }
+           output_object.EndTable("",100, "Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+          }
+  output_object.WriteReport();  
+}
+
+function _Compare (_epc, _defs) {
+//var defsArray =[];
+//   var  defsArray=_defs.OccListInModel(_epc);
+        if (_defs.OccListInModel(_epc)==0) return false;
+        else {  for (var i=0; i<defsArray.length; i++)
+            {
+                if (defsArray[i].ObjDef() ==_defs) return true;
+            }
+        }
+    return false
+
+}

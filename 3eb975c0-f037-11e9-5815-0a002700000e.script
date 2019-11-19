@@ -1,0 +1,54 @@
+// explane global objects: 
+//Context
+//ArisData
+//Dialogs
+var g_Nloc = Context.getSelectedLanguage();
+
+
+main(); //вызов главной функции скрипта
+
+function main () {
+
+   var output_object = Context.createOutputObject(); //создали объект вывода
+    
+  var selected_obj = ArisData.getSelectedObjOccs(); //взяли объект из контекста (должны взять по крайней мере)
+  //запускаю скрипт на объекте "Закупки МБП"
+  
+  for(var i=0; i<selected_obj.length; i++ )
+ {
+     var curr_obj=selected_obj[i];
+  // вывели название сценария в отчет "Закупки МБП"
+    output_object.OutputLn(curr_obj.ObjDef().Name(Context.getSelectedLanguage()),"Arial",16,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_CENTER | Constants.FMT_ITALIC | Constants.FMT_BOLD,0);
+    
+     output_object.BeginTable(100,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+       //each row must begin with TableRow()
+        output_object.TableRow(); 
+        output_object.TableCell("№ п/п",10,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Процесс",25,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Количество функций",20,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Количество автоматизированных функций",15,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Уровень автоматизации, %%",20,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0);
+//        
+        
+         
+//        далее необходимо взять все исходящие связи от этого объекта. по идее это представления объектов типа функция, связанная с объектом "Закупки МБП" исх связями (тип2) 
+         var roles = curr_obj.getConnectedObjOccs([Constants.ST_PRCS_1],Constants.EDGES_OUT);
+         
+         
+         for (j=0;j< roles.length; j++)
+         { 
+             var current_func = roles[j];
+           output_object.TableRow(); 
+           output_object.TableCell(""+j,10,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+           output_object.TableCell(current_func.ObjDef().Name(Context.getSelectedLanguage()),25,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+           //далее необходимо взять каждый  roles[j] и для него пересчитать кол-во автоматизированных и неавтоматизированный функций
+           var func_list = current_func.getConnectedObjOccs([Constants.ST_FUNC],Constants.EDGES_INOUT);
+//           Dialogs.MsgBox(current_func.ObjDef().Name(Context.getSelectedLanguage())+" "+conected_func.length);
+            
+         }
+          output_object.EndTable("",100, "Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+ }
+ 
+    
+ output_object.WriteReport();   
+}

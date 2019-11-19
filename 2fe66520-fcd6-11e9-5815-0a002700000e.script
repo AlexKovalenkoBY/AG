@@ -1,0 +1,25 @@
+var File = Context.createOutputObject();  
+var colWidthList = new java.util.ArrayList(); 
+colWidthList.add(25); 
+colWidthList.add(75); 
+  
+File.BeginTable(100, colWidthList, Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC,0); 
+File.TableRow(); 
+File.TableCell(" this is the text of cell 11 ",1,1,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+File.TableCell(" this is the text of cell 12 ",1,2,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+File.TableRow(); 
+//File.TableCell(" this is the text of cell 13 ",1,3,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableCell(" this is the text of cell 14",1,4,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableRow(); 
+//File.TableCell(" this is the text of cell 21 ",3,1,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableCell(" this is the text of cell 22 ",2,2,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableCell(" this is the text of cell 2 ",2,2,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableRow(); 
+//File.TableCell(" this is the text of cell 31 ",3,1,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableCell(" this is the text of cell 32 ",3,2,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0);
+//File.TableCell(" this is the text of cell 3 ",1,1,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableRow(); 
+//File.TableRow(); 
+//File.TableRow(); 
+File.EndTable("TESTSHEET1",100, "Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+File.WriteReport();
