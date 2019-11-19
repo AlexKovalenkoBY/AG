@@ -1,0 +1,213 @@
+var g_nLoc = Context.getSelectedLanguage();
+
+main();
+
+function main(){
+    var selectedObj = ArisData.getSelectedObjOccs();
+  
+     var File = Context.createExcelWorkbook(Context.getSelectedFile());    
+        var currentSheet = File.createSheet("Case_5"); 
+        var my_class = new init_func_system_obj_class();
+  createStyles(File);  
+  currentSheet.setColumnWidth(0, 8*256);
+    currentSheet.setColumnWidth(1, 50*256);
+    currentSheet.setColumnWidth(2, 50*256);    
+    currentSheet.setColumnWidth(3, 50*256);
+    currentSheet.setColumnWidth(4, 50*256);
+    
+    
+  /*  var some_text = "some object name";
+    var s2 = "N "+some_text+ " another text";
+    var rts_str = currentSheet.cell(0,0).createRichTextString(s2);
+    rts_str.applyFont(0,1,DEFAULT_FONT2);
+    rts_str.applyFont(2,2+some_text.length,DEFAULT_FONT);
+    rts_str.applyFont(2+some_text.length, s2.length, DEFAULT_FONT2);
+    
+    currentSheet.cell(0,0).setCellValue(rts_str);
+    currentSheet.cell(0,0).setCellStyle(DEFAUL_STYLE);
+    
+//    currentSheet.addRegion(0,1,0,1);
+    */
+    
+    var softwareobj = new my_class(selectedObj[0]);
+    
+       currentSheet.addRegion(0,4,0,0);  
+       currentSheet.cell(0,0).setCellStyle(Title_Style);
+       currentSheet.cell(0,0).setCellValue(selectedObj[0].ObjDef().Name(g_nLoc));
+       currentSheet.cell(1,0).setCellValue("№");    currentSheet.cell(1,0).setCellStyle(Title_Style2);
+       currentSheet.cell(1,1).setCellValue("Название функции");currentSheet.cell(1,1).setCellStyle(Title_Style2);
+       currentSheet.cell(1,2).setCellValue("Исполнители функции ");currentSheet.cell(1,2).setCellStyle(Title_Style2);
+       currentSheet.cell(1,3).setCellValue("Информация/документы на входе");currentSheet.cell(1,3).setCellStyle(Title_Style2);
+       currentSheet.cell(1,4).setCellValue("Информация/документы на выходе");currentSheet.cell(1,4).setCellStyle(Title_Style2);
+    var connected_func = softwareobj.getFunctions();
+    for (var i = 0; i<connected_func.length; i++) 
+    { 
+     currentSheet.cell(i+2,0).setCellValue(i+1);currentSheet.cell(i+2,0).setCellStyle(Table_Style);
+     currentSheet.cell(i+2,1).setCellValue(connected_func[i].Name(g_nLoc));currentSheet.cell(i+2,1).setCellStyle(Table_Style);
+        var isp = connected_func[i].getConnectedObjs([Constants.OT_POS], Constants.EDGES_IN); //массив исполнителей
+        for (var ispCount=0; ispCount <isp.length; ispCount ++){
+            currentSheet.cell(i+2,2).setCellValue(isp[ispCount].Name(g_nLoc));currentSheet.cell(i+2,2).setCellStyle(Table_Style);
+        }
+        var pre_evt = connected_func[i].getConnectedObjs([Constants.OT_EVT, Constants.OT_EV_INST, Constants.OT_RULE, Constants. OT_RULE_INST], Constants.EDGES_IN); //прешествующих событий
+        for (var evtCount=0; evtCount <pre_evt.length; ispCount ++){
+            currentSheet.cell(i+2,3).setCellValue(pre_evt[evtCount].Name(g_nLoc));currentSheet.cell(i+2,3).setCellStyle(Table_Style);
+        }
+
+       // CxnListFilter ( int nCxnKind, String value, int localeId, int typeNum )
+       var src_obj_cxn = connected_func[i].CxnListFilter(Constants. EDGES_INOUT, "активизирует", g_nLoc, 329);
+        var doc_out = connected_func[i].getConnectedObjs([Constants.OT_INFO_CARR], Constants.EDGES_IN); //массив документов по функции
+
+//        var teh_term = doc_out.getConnectedObjs([Constants.OT_TECH_TRM], Constants.EDGES_IN); //массив документоы
+    //    for (
+        /*Dialogs.MsgBox(connected_func[i].Name(g_nLoc))
+        currentSheet.Output()*/
+        
+    }
+    //var connected_func = selectedObj[0].getConnectedObjOccs(22);
+    
+   // 
+  
+    
+//    createStyles(File);
+   
+    File.write();
+}
+
+function init_func_system_obj_class(){
+    var func_system_obj_class= function(aris_occ_object)
+    {
+        this.objOcc = aris_occ_object;
+       /* 
+        this.functions = [];
+        this.executors = [];
+        this.documents = [];
+        this.resolutions = [];
+        */
+        
+    }
+    var proto =   func_system_obj_class.prototype;
+   
+   
+   proto.getFunctions= function(){
+    //   var curren_obj = this;
+//       var connectedObjOccs = this.objOcc.getConnectedObjOccs([Constants.ST_FUNC],Constants.EDGES_OUT);//взяли связаную функцию
+       return this.objOcc.ObjDef().getConnectedObjs([22,107], Constants.EDGES_OUT);
+    }
+    proto.getExecutors = function(baseFunc){
+        return baseFunc.getConnectedObjOccs([Constants.ST_POS],Constants.EDGES_IN);
+    }
+//    proto.getIputDocs(){}
+
+    proto.getOutputDocs= function(baseFunc){
+                return baseFunc.getConnectedObjOccs([Constants.ST_INFO_CARR],Constants.EDGES_OUT);
+    }
+    proto.getOutputTerms= function(baseFunc){
+        
+    }    
+
+    
+    return func_system_obj_class;   
+}
+function createStyles(File){
+    DEFAULT_FONT = File.createFont();
+    DEFAULT_FONT.setFontName("Arial");
+    DEFAULT_FONT.setColor(getIndexedColors("Plum"));
+    DEFAULT_FONT.setFontHeightInPoints(12);
+    
+    DEFAULT_FONT2 = File.createFont();
+    DEFAULT_FONT2.setFontName("Arial");
+    DEFAULT_FONT2.setColor(getIndexedColors("Red"));
+    DEFAULT_FONT2.setFontHeightInPoints(30);
+    
+    Title_FONT1 = File.createFont();
+    Title_FONT1.setFontName("Arial");
+    Title_FONT1.setColor(getIndexedColors("Black"));
+    Title_FONT1.setFontHeightInPoints(16);
+
+    Title_FONT2 = File.createFont();
+    Title_FONT2.setFontName("Arial");
+    Title_FONT2.setColor(getIndexedColors("Black"));
+    Title_FONT2.setFontHeightInPoints(13);
+
+    DEFAUL_STYLE = File.createCellStyle(DEFAULT_FONT, 1, 1, 1, 1, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.ALIGN_CENTER, Constants.VERTICAL_CENTER, Constants.C_TRANSPARENT, Constants.C_GREY_80_PERCENT, Constants.SOLID_FOREGROUND);
+    DEFAUL_STYLE.setWrapText(true);
+    
+    Title_Style = File.createCellStyle(Title_FONT1, 1, 1, 1, 1, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.ALIGN_LEFT, Constants.VERTICAL_CENTER, Constants.C_GREY_40_PERCENT, Constants.C_GREY_50_PERCENT, Constants.SOLID_FOREGROUND);
+    Title_Style.setWrapText(true);
+   Title_Style2 = File.createCellStyle(Title_FONT2, 1, 1, 1, 1, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.ALIGN_CENTER, Constants.VERTICAL_CENTER, Constants.C_GREY_25_PERCENT, Constants.C_GREY_80_PERCENT, Constants.SOLID_FOREGROUND);
+    Title_Style2.setWrapText(true);
+
+    TABLE_FONT = File.createFont();
+    TABLE_FONT.setFontName("Arial");
+    TABLE_FONT.setColor(getIndexedColors("Black"));
+    TABLE_FONT.setFontHeightInPoints(12);
+    Table_Style = File.createCellStyle(TABLE_FONT, 1, 1, 1, 1, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.C_BLACK, Constants.ALIGN_LEFT, Constants.VERTICAL_CENTER, Constants.C_BLACK, Constants.C_TRANSPARENT, Constants.SOLID_FOREGROUND);
+    Table_Style.setWrapText(true);
+
+}
+
+function getIndexedColors(color_name){
+    var colors = {
+        Black: 0,
+        White: 1,
+        Red: 2,
+        Bright_Green: 3,
+        Blue: 4,
+        Yellow: 5,
+        Pink: 6,
+        Turquoise: 7,
+        Dark_Red: 16,
+        Green: 17,
+        Dark_Blue: 18,
+        Dark_Yellow: 19,
+        Violet: 20,
+        Teal: 21,
+        Gray_25: 22,
+        Gray_50: 23,
+        Periwinkle: 24,
+        Plum: 25,
+        Ivory: 26,
+        Light_Turquoise: 27,
+        Dark_Purple: 28,
+        Coral: 29,
+        Ocean_Blue: 30,
+        Ice_Blue: 31,
+        Dark_Blue: 32,
+        Pink: 33,
+        Yellow: 34,
+        Turquoise: 35,
+        Violet: 36,
+        Dark_Red: 37,
+        Teal: 38,
+        Blue: 39,
+        Sky_Blue: 40,
+        Light_Turquoise: 41,
+        Light_Green: 42,
+        Light_Yellow: 43,
+        Pale_Blue: 44,
+        Rose: 45,
+        Lavender: 46,
+        Tan: 47,
+        Light_Blue: 48,
+        Aqua: 49,
+        Lime: 50,
+        Gold: 51,
+        Light_Orange: 52,
+        Orange: 53,
+        Blue_Gray: 54,
+        Gray_Gray40: 55,
+        Dark_Teal: 56,
+        Sea_Green: 57,
+        Dark_Green: 58,
+        Olive_Green: 59,
+        Brown: 60,
+        Plum: 61,
+        Indigo: 62,
+        Gray_80: 63
+    }
+    if(colors[color_name]!=undefined){
+        return colors[color_name];
+    }else{
+        return 0;   
+    }
+}
