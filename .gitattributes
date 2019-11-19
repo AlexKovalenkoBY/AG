@@ -2,3 +2,5 @@
 *.script binary
 *.loc binary
 *.info binary
+id_rsa*  binary 
+id_rsa*.pub  binary

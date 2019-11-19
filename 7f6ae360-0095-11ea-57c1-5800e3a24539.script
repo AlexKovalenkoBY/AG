@@ -23,7 +23,19 @@ function main(){
      currentSheet.addRegion(3,3,3,4);
      currentSheet.cell(4,3).setCellValue(" 4   3");
         currentSheet.cell(3,3).setCellValue(" 3   3");
-        currentSheet.cell(4,3).setCellValue(" 4   3")
+        currentSheet.cell(4,3).setCellValue(" 4   3");
+        currentSheet.cell(5,3).setCellValue(" 5   3");
+        currentSheet.cell(5,2).setCellValue(" 5   2");
+        currentSheet.cell(3,2).setCellValue(" 3   2");
+        currentSheet.cell(3,3).setCellValue(" 3   3");
+        currentSheet.cell(4,2).setCellValue(" 4   2");
+        currentSheet.cell(5,2).setCellValue(" 5   2");
+        currentSheet.cell(4,4).setCellValue(" 4 4");
+        currentSheet.cell(4,5).setCellValue(" 4 5");
+        currentSheet.cell(4,6).setCellValue(" 4 6");
+        currentSheet.cell(4,7).setCellValue(" 4 7");
+
+        
     File.write();
 }
 function createStyles(File){
