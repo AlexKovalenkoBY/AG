@@ -1,0 +1,88 @@
+var g_Nloc = Context.getSelectedLanguage();
+var File = Context.createOutputObject();
+
+main();
+
+function main(){
+
+var SelectedModelList = ArisData.getSelectedModels();
+
+File.BeginSection(true, Constants.SECTION_COVER); 
+//Output text 
+File.OutputLn(" \n  \n  \n  \n Титульная страница \n Задание 4 ", "Arial", 20, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_CENTER, 0); 
+File.EndSection();
+File.BeginSection(297, 210, 10, 10, 30, 30, 30, 30, false, Constants.SECTION_INDEX); 
+//Header 
+File.BeginHeader(); 
+File.BeginTable(100, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_CENTER, 0); 
+File.TableRow(); File.TableCell("ОАО \"Белагропромбанк\"", 100, "Arial", 10, Constants.C_BLACK, Constants.C_WHITE, 0, Constants.FMT_CENTER | Constants.FMT_VCENTER, 0); 
+File.EndTable(" ", 100, "Arial", 10, Constants.C_BLACK, Constants.C_WHITE, 0, Constants.FMT_LEFT, 0); 
+File.EndHeader(); 
+//Footer 
+File.BeginFooter(); 
+File.BeginTable(100, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_CENTER, 0); 
+File.TableRow(); 
+File.TableCell("содержание документа (нижний колонтитул)", 100, "Arial", 10, Constants.C_BLACK, Constants.C_WHITE, 0, Constants.FMT_CENTER | Constants.FMT_VCENTER, 0); 
+File.EndTable("Table_of_Contents", 100, "Arial", 10, Constants.C_BLACK, Constants.C_WHITE, 0, Constants.FMT_LEFT, 0); 
+File.EndFooter(); //Sets the autonumbering on 
+File.SetAutoTOCNumbering(true); //Defines the style for the four levels in the TOC 
+File.SetTOCFormat(0, "Arial", 16, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_LEFT | Constants.FMT_BOLD | Constants.FMT_ITALIC, 0, 0, 0, 0); 
+File.SetTOCFormat(1, "Arial", 12, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_LEFT | Constants.FMT_BOLD, 5, 5, 2, 2); 
+File.SetTOCFormat(2, "Arial", 12, Constants.C_RED, Constants.C_WHITE, Constants.FMT_LEFT | Constants.FMT_ITALIC, 10 , 5, 2, 2); 
+//File.SetTOCFormat(3, "Arial", 10, Constants.C_BLUE, Constants.C_WHITE, Constants.FMT_LEFT, 15, 5, 2, 2); //Output text 
+File.OutputLn("СОДЕРЖАНИЕ:", "Arial", 30, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_LEFT, 0); //Adds the table of content 
+File.OutputField(Constants.FIELD_TOC, "Arial", 10, Constants.C_BLACK, Constants.C_WHITE, Constants.FMT_LEFT); 
+File.SetAutoTOCNumbering(false);
+File.EndSection();
+var SelectedModel = SelectedModelList[0];
+SelectedModel.BuildGraph(true);
+var startObjects_array = SelectedModel.StartNodeList().filter(function(startObject)
+{    return startObject.SymbolNum()==Constants.ST_APPL_SYS_CLS});
+
+    startObjects_array.forEach(function(startObject)
+    {
+        File.OutputLn(startObject.ObjDef().Name(g_Nloc),"Arial",24,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_CENTER| Constants.FMT_ITALIC|Constants.FMT_BOLD|Constants.FMT_TOCENTRY0,0)
+     //   Dialogs.MsgBox(startObject.ObjDef().Name(g_Nloc));
+        SelectedModel.MarkVisited(startObject,true);
+});
+
+; 
+DrawChild(startObjects_array[0], File, SelectedModel,0,24,1);//вызов от старта
+
+File.WriteReport();
+}
+function DrawChild(startObject, output, model,count,fontsize, level)
+{
+  
+    var conected_to_start_nodes = startObject.getConnectedObjOccs([Constants.ST_APPL_SYS_CLS,Constants.ST_APPL_SYS_TYPE,Constants.ST_MOD_TYPE], Constants.EDGES_INOUT).filter(function(startObject){return model.GetVisited(startObject)==false});
+     if (conected_to_start_nodes.length !=0)
+    {  for (var i=0; i<conected_to_start_nodes.length;i++) 
+        { 
+  /*  var colWidthList = new java.util.ArrayList(); 
+colWidthList.add(25); 
+colWidthList.add(75);
+File.BeginTable(100,colWidthList, Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC,0); 
+            File.TableRow();*/
+            var numprefix ="";
+           (count==0)?  numprefix = (1+i)+".":  numprefix = ""+count+(i+1)+"."; 
+            if (!model.GetVisited(conected_to_start_nodes[i])) 
+            {   model.MarkVisited(conected_to_start_nodes[i],true);
+  // File.TableRow();
+   //File.TableCell(numprefix+conected_to_start_nodes[i].ObjDef().Name(g_Nloc),i,1,"Arial",14,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+//File.TableCell(" this is the text of cell 12 ",1,1,"Arial",14,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_CENTER,0); 
+          File.OutputLn(numprefix+conected_to_start_nodes[i].ObjDef().Name(g_Nloc),"Arial",fontsize-2 ,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC|Constants.FMT_TOCENTRY0,level+9);
+                DrawChild(conected_to_start_nodes[i], output, model,numprefix,fontsize-2,level+10);
+                    var decomposited_models = conected_to_start_nodes[i].ObjDef().AssignedModels([21,170]); //массив декомпозированных моделей
+                if (decomposited_models.length!=0) {
+                   for (var d=0; d<decomposited_models.length;d++) {
+                       decomposited_models[d].BuildGraph(true);
+                       var startObjects_array = decomposited_models[d].StartNodeList().filter(function(startObject){return startObject.SymbolNum()==Constants.ST_APPL_SYS_TYPE}); 
+                        decomposited_models[d].MarkVisited(startObjects_array[0],true);
+                         DrawChild(startObjects_array[0], output, decomposited_models[d],numprefix,fontsize-2,level+10);
+                   }
+                };
+             }
+        }
+    }
+    else return
+}

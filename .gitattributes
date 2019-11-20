@@ -1,6 +1,12 @@
 *.pbxproj binary
+<<<<<<< HEAD
 *.script binary
 *.loc binary
 *.info binary
 id_rsa*  binary 
 id_rsa*.pub  binary
+=======
+*.info binary
+*.script binary
+*.loc binary
+>>>>>>> 20.11.2019 from job

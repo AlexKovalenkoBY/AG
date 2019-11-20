@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scriptinfodata version="7.1.0">
+    <scriptinfo idcomp="1" runkind="0" runtypes="" contexttype="1" eventids="" extratypes="" outfiletypes="5," scriptlang="2" filter="" template="" dialogsallowed="1" dbwriteallowed="1">
+        <contexts>
+            <context clsid="10009" types="" usertypes="" />
+        </contexts>
+        <pageformat name="A4" width="210" height="297" orientation="1" top="30" left="20" right="20" bottom="30" dheader="10" dfooter="10" />
+        <protection cdkey="" kind="0" passwd="" />
+        <debuginfos bookmarks="" breakpoints="">
+            <evaluates>
+                <eval>connected_func[i].Name(g_nLoc)</eval>
+            </evaluates>
+        </debuginfos>
+    </scriptinfo>
+</scriptinfodata>
+

@@ -1,0 +1,81 @@
+var g_Nloc = Context.getSelectedLanguage();
+var File = Context.createOutputObject();
+main();
+
+function main(){
+
+var SelectedModelList = ArisData.getSelectedModels();
+var SelectedModel = SelectedModelList[0];
+SelectedModel.BuildGraph(true);
+var startObjects = SelectedModel.StartNodeList().filter(function(startObject)
+{    return startObject.SymbolNum()==Constants.ST_APPL_SYS_CLS});
+
+    startObjects.forEach(function(startObject)
+    {
+        File.OutputLn(startObject.ObjDef().Name(g_Nloc),"Arial",24,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC,0)
+        SelectedModel.MarkVisited(startObject,true);
+        
+     //   startObject.getConnectedObjOccs([Constants.ST_APPL_SYS_CLS,Constants.ST_APPL_SYS_TYPE,Constants.ST_MOD_TYPE], Constants.EDGES_INOUT).filter(function(startObject){return SelectedModel.GetVisited(startObject)==false      });
+});
+
+
+/*var nextLayer = startObjects[0].getConnectedObjOccs([Constants.ST_APPL_SYS_CLS], Constants.EDGES_INOUT);
+for (var i =0; i<nextLayer.length; i++)
+{
+    
+    File.OutputLn(i+1 + ". "+nextLayer[i].ObjDef().Name(g_Nloc),"Arial",16,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC,0)
+ 
+   WriteChilds(nextLayer[i], File,SelectedModel);
+   
+   
+}*/
+//if ChildExist()
+/*
+далее необходимо: 
+1. взять связанные объекты
+2. для каждого элемента массива связанных объектов вывести его связанные элементы. 
+3. пока есть дочерние элементы повторять 1-2. при этом отмечать пройденные узлы
+4. перейти на свзязанную модель при ее наличии и повторять 1-2
+
+*/
+//function(startObject){return SelectedModel.GetVisited(startObject)==false}
+File.WriteReport();
+}
+function ChildExist(object){
+    
+return object.getConnectedObjOccs([Constants.ST_APPL_SYS_CLS,Constants.ST_APPL_SYS_TYPE,Constants.ST_MOD_TYPE], Constants.EDGES_INOUT).filter(function(startObject){return SelectedModel.GetVisited(startObject)==false});
+
+}
+
+function WriteChilds(oobjOcc, output, model){
+var connectedobjs= oobjOcc.getConnectedObjOccs([Constants.ST_APPL_SYS_TYPE], Constants.EDGES_IN);
+    if (connectedobjs!=null) 
+    {  
+        for (var i = 0; i<connectedobjs.length;i++)
+        {
+         output.OutputLn(connectedobjs[i].ObjDef().Name(g_Nloc),"Arial",16,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+            model.MarkVisited(connectedobjs[i],true);
+     // Dialogs.MsgBox(connectedobjs[i].ObjDef().Name(g_Nloc));
+         WriteChilds(connectedobjs[i]);
+           
+        }
+ }
+
+}
+
+function WriteTree(oobjOcc, output, model){
+var connectedobjs= oobjOcc.getConnectedObjOccs([Constants.ST_APPL_SYS_TYPE], Constants.EDGES_IN);
+    if (connectedobjs!=null) 
+    {  
+  /*      for (var i = 0; i<connectedobjs.length;i++)
+        {
+         output.OutputLn(connectedobjs[i].ObjDef().Name(g_Nloc),"Arial",16,Constants.C_BLACK,Constants.C_TRANSPARENT,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+            model.MarkVisited(connectedobjs[i],true);*/
+     // Dialogs.MsgBox(connectedobjs[i].ObjDef().Name(g_Nloc));
+        
+        
+        WriteChilds(connectedobjs[i]);
+           
+        }
+ 
+}

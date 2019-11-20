@@ -1,0 +1,93 @@
+var g_Nloc = Context.getSelectedLanguage();
+ var xml_file = Context.createXMLOutputObject("xml_expot.xml","Root");
+// var    ProcessNode = xml_file.addElement(xml_file.getRootElement(), "Process");
+main();
+function main(){
+    
+   
+    var selected_obj = ArisData.getSelectedObjOccs(); //выбранный объект из контекста (может быть несколько) 
+    
+var func_list=[]; //массив функций для сценария
+
+for (pr_list=0; pr_list<selected_obj.length; pr_list++) {
+
+    var    ProcessNode = xml_file.addElement(xml_file.getRootElement(), "Process");
+        ProcessNode.setAttribute("Name", selected_obj[pr_list].ObjDef().Name(g_Nloc));   
+
+  if (selected_obj[pr_list].SymbolNum()==Constants.ST_SCENARIO) { 
+       var  func_list  = selected_obj[pr_list].getConnectedObjOccs([72,335]);
+        OutXML(func_list, xml_file, ProcessNode);
+  } //если выбран сценарий, то в работу идут все привязанные к нему функции
+    else 
+        { var func_list = selected_obj
+            OutXML(func_list, xml_file,ProcessNode )} //если выбран н
+ }
+    xml_file.WriteReport();
+}
+
+function OutXML(func_list, xml_file,ProcessNode){
+    for (k=0;k<func_list.length;k++)
+{
+ 
+
+//var    ModelsNode = xml_file.addElement(ProcessNode, "Models");
+var    ModelNode = xml_file.addElement(ProcessNode, "Model");
+var    ObjNode = xml_file.addElement(ModelNode, "ObjOcc");
+var InConnNode =  xml_file.addElement(ObjNode, "InConnections");
+var OutConnNode =  xml_file.addElement(ObjNode, "OutConnections");
+    
+    ModelNode.setAttribute("Name", func_list[k].ObjDef().Name(g_Nloc));
+    
+    assigned_models =func_list[k].ObjDef().AssignedModels(13);
+    if (assigned_models.length==0) assigned_models = func_list[k].getConnectedObjOccs([22], Constants.EDGES_INOUT);
+    
+//var oObjOccs = oSelModels.ObjOccList();
+    for (var j = 0; j < assigned_models.length; j++) {
+
+        var currentmodel = assigned_models[j];//назначенная модель [0]
+    //    ModelsNode.setAttribute("Name","model_name~");//currentmodel.ObjDef().Name().toString());
+         var modelObjOccs =currentmodel.ObjOccList();
+        for (var i=0; i<modelObjOccs.length;i++)
+        {
+          
+            var xml_item =  write2Xml(xml_file, ObjNode, modelObjOccs[i], "ObjOcc");
+             writeXmlCxnIn(xml_file,ObjNode,modelObjOccs[i].InEdges(Constants.EDGES_ALL), "InConnections");
+             writeXmlCxnOut(xml_file, ObjNode,modelObjOccs[i].OutEdges(Constants.EDGES_ALL), "OutConnections");
+                           //куда,    кто родитель, что,                                        с каким атрибутом
+        }
+    }
+    
+}
+
+}
+
+function write2Xml(xmlOutput, xmlParent, oOcc, sElement) {
+    var xmlItem = xmlOutput.addElement(xmlParent, sElement);
+    xmlItem.setAttribute("Name", oOcc.ObjDef().Name(g_Nloc));
+    xmlItem.setAttribute("Type", oOcc.ObjDef().TypeNum());
+    xmlItem.setAttribute("Symbol", oOcc.SymbolName());
+    xmlItem.setAttribute("ID", oOcc.ObjDef().GUID());
+    return xmlItem;
+}
+
+function writeXmlCxnIn(xmlOutput, xmlParent, oCxn, sElement) {
+for (var i=0;i<oCxn.length; i++) {
+    var xmlCxn = xmlOutput.addElement(xmlParent, sElement);
+
+    xmlCxn.setAttribute("SourceName", oCxn[i].SourceObjOcc().ObjDef().Name(g_Nloc));
+    xmlCxn.setAttribute("SourceType", oCxn[i].SourceObjOcc().ObjDef().Type());
+    xmlCxn.setAttribute("SourceGUID", oCxn[i].SourceObjOcc().ObjDef().GUID());
+    
+}
+ //   return xmlCxn;
+}
+
+function writeXmlCxnOut(xmlOutput, xmlParent, oCxn, sElement) {
+for (var i=0;i<oCxn.length; i++) {
+    var xmlCxn = xmlOutput.addElement(xmlParent, sElement);
+    xmlCxn.setAttribute("TargetName", oCxn[i].TargetObjOcc().ObjDef().Name(g_Nloc));    
+    xmlCxn.setAttribute("TargetType", oCxn[i].TargetObjOcc().ObjDef().Type());
+    xmlCxn.setAttribute("TargetGUID", oCxn[i].TargetObjOcc().ObjDef().GUID());
+   // return xmlCxn;
+}
+}
