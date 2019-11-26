@@ -1,0 +1,66 @@
+// explane global objects: 
+//Context
+//ArisData
+//Dialogs
+
+//explain global variables
+var g_nLoc  = Context.getSelectedLanguage();
+//Main function used to separate global variables
+main();
+
+function main(){
+  //get models selected on script start  
+  var selected_models = ArisData.getSelectedModels();
+
+  //create result file
+  var output_object = Context.createOutputObject();
+  
+  for(var i=0;i<selected_models.length;i++){
+    var current_model = selected_models[i];
+    // list of functions on model
+    var functions_list = current_model.ObjOccListFilter(22);
+    //out some line of text to result file
+    output_object.OutputLn(current_model.Name(g_nLoc),"Arial",16,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC | Constants.FMT_BOLD,0);
+    //create table on result file
+    output_object.BeginTable(100,Constants.C_BLACK,Constants.C_WHITE,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+       //each row must begin with TableRow()
+        output_object.TableRow(); 
+        output_object.TableCell("#",10,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Функция",25,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Описание функции",20,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Исполнитель",15,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0); 
+        output_object.TableCell("Assigned EPC",20,"Arial",10,Constants.C_BLACK,Constants.C_BLUE_GREY,0,Constants.FMT_LEFT|Constants.FMT_BOLD,0);
+     //forEach - it is an JavaScript Array method. Explain more https://developer.mozilla.org/uk/docs/Web/JavaScript/Reference/Global_Objects/Array
+     functions_list.forEach(function(func, index){
+         //object an have assigned models
+            var Assigned_Models  = func.ObjDef().AssignedModels(13);
+            var Assign_model_name = "";
+            if(Assigned_Models.length>0){
+                Assign_model_name=Assigned_Models[0].Name(g_nLoc);
+            }
+           
+            var roles = func.getConnectedObjOccs([143], Constants.EDGES_IN);
+            
+            var roles_str = roles.map(function(item, index){ return (index+1)+". "+item.ObjDef().Name(g_nLoc)}).join(";\n");
+           
+            output_object.TableRow(); 
+            output_object.TableCell(""+index,10,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT,0); 
+            //use ObjDef() method to get object attributes
+            output_object.TableCell(func.ObjDef().Name(g_nLoc),25,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT,0); 
+            //GetValue(false) - not trims new line sumbols in text ; 
+            //GetValue(true) - trim new line sumbols
+            output_object.TableCell(func.ObjDef().Attribute(Constants.AT_DESC, g_nLoc).GetValue(false),20,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT,0);
+            output_object.TableCell(roles_str,15,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT,0);
+            output_object.TableCell(Assign_model_name,20,"Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT,0); 
+            
+     });
+      
+    //table must have   EndTable 
+    output_object.EndTable("",100, "Arial",10,Constants.C_BLACK,Constants.C_WHITE,0,Constants.FMT_LEFT | Constants.FMT_ITALIC,0);
+    
+  }
+      //return result file to the user 
+  output_object.WriteReport();
+}
+
+
