@@ -1,0 +1,18 @@
+var g_nLoc = Context.getSelectedLanguage();
+var PublicInterface = undefined;
+main2();
+function main2(){
+    PublicInterface = JavaImporter(
+        java.io.FileInputStream,
+        org.apache.commons.io.IOUtils,
+        java.io.StringWriter
+    );
+    var file_path = "D:\\org\\csbo.txt";
+    
+    var writer = new PublicInterface.StringWriter();
+    
+    PublicInterface.IOUtils.copy(new PublicInterface.FileInputStream(file_path), writer, "UTF-8"); 
+    
+    var csvData = writer.toString();    
+    
+    Dialogs.MsgBox(csvData);
