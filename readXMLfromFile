@@ -1,0 +1,20 @@
+var g_nLoc = Context.getSelectedLanguage(); 
+var oGroup = ArisData.getSelectedGroups()[0];
+
+var importFile = getImportFile();
+if (importFile != null) {
+    var xmlData = importFile.getData();             // Content of the file
+    var xmlReader = Context.getXMLParser(xmlData);  // Parses the specified XML file and returns an object that provides access to the XML document.
+    if (xmlReader.isValid()) {
+        var xmlRoot = xmlReader.getRootElement();   // Root element of the XML document
+        var xmlEMPLOYEES = xmlRoot.getChild("EMPLOYEES");
+        var xmlEmployee = xmlEMPLOYEES.getChildren("EMPLOYEE");
+        var array = []; 
+        for (var i=0;i<xmlEmployee.size();i++){
+         var pos = xmlEmployee.get(i).getChildText("NamePosts");
+         var idDiv = xmlEmployee.get(i).getChildText("IDDivision") ;
+         array.push([idDiv,pos]);
+        }
+ var s=0;     
+}// if (xmlReader.isValid()
+}
