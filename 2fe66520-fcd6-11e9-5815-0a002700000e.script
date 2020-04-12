@@ -1,3 +1,4 @@
+var test = null; // add test variable to check github LF/CRLF
 var File = Context.createOutputObject();  
 var colWidthList = new java.util.ArrayList(); 
 colWidthList.add(25); 
